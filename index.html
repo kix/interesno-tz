@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" media="screen" type="text/css" href="css/style.css">
+  <script type="text/javascript" src="http://yandex.st/modernizr/1.7/modernizr.min.js"></script>
+  <script type="text/javascript" src="http://yandex.st/jquery/1.5.1/jquery.min.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
+  <title>Blank template</title>
+</head>
+<body>
+  <div id="header">
+    <h1>Тестовое задание для &laquo;Очень Интересно&raquo;</h1>
+  </div>
+  <div id="content" class="clearfix">
+    <div id="sidebar">
+      <form id="upload-form" method="POST" action="api.php" enctype="multipart/form-data">
+        <input type="file" name="file" id="file" /><br />
+        <input type="hidden" name="action" id="action" value="upload_file" />
+        <input type="submit" class="button" value="Загрузить XML-файл" />
+      </form>
+      <ul id="files">
+       </ul>
+    </div>
+    <div id="the-content">
+    </div>
+  </div>
+  <div id="footer">
+    <p class="copy">Тестовое написал Степан Анчугов 24 мая 2011</p>
+  </div>
+</body>
+</html>

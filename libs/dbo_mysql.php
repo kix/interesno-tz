@@ -6,26 +6,58 @@
 class DBO_MySQL {
   
   protected $_link;
+  
+  function d($msg){
+    if ($this->app) {
+      $this->app->debug[] = array('object'=>'DBO', 'message'=>$msg);
+    }
+  }
 
   /**
    * Connects to a database
    * @return boolean True on success
    */
-  public function __construct(){
+  public function __construct($app = false){
+    if ($app) {
+      $this->app = $app;
+    }
     return $this->connect();
   }
 
   /**
    * Connects to a database using pre-defined constants from config
+   * TODO: scary code
    * @return boolean True on successful connection
    */
-  private function connect(){
-    $this->_link = mysql_connect(HOST, USER, PASS);
-    if (mysql_select_db(BASE)){
-      return True;
-    } else {
-      return False;
-    }
+  function connect(){
+    if ($this->app) {
+      $this->d('Starting DBO from app config');
+      
+      $this->_link = mysql_connect($this->app->config['db_host'], 
+                                   $this->app->config['db_user'], 
+                                   $this->app->config['db_pass']);
+      if (!$this->_link) {
+        $this->d('Could not connect to DB');
+      } else {
+        $this->d('Connected to DB '.$this->app->config['db_user'].'@'.$this->app->config['db_host']);
+      }
+      if (mysql_select_db($this->app->config['db_base'], $this->_link)) {
+        $this->d('Connected and selected DB');
+        return True;
+      } else {
+        $this->d('Could not select DB: '.$this->app->config['db_base']);
+        return False;        
+      }
+    } else { // TODO: dirty code
+      $this->_link = mysql_connect(HOST, USER, PASS);
+      if (mysql_select_db(BASE)){
+        $this->d('Connected and selected DB');
+        return True;
+      } else {
+        $this->d('Could not select DB!');
+        return False;
+      }
+     }
   }
   
   /**
@@ -39,11 +71,14 @@ class DBO_MySQL {
     }
     if ( substr($query,0,3) == 'INSE'
       || substr($query,0,3) == 'UPDA') {
+      $this->d('Insert/update query:' . $query);
       mysql_query($query, $this->_link);
       return mysql_insert_id();
       }
-    //print $query."<br/>\n";
-    return @mysql_query($query, $this->_link);
+    $this->d('Select query: ' . $query);
+    $data = mysql_query($query, $this->_link);
+
+    return $data;
   }
   
   /**
@@ -54,11 +89,15 @@ class DBO_MySQL {
   private function object($data){
     $ret = array();
     if ($data){
+      $this->d('Got data');
       while ($row = mysql_fetch_assoc($data)){
         $ret[] = $row;
       }
       return $ret;
-    }// else throw new Exception;
+    } else {
+      // throw ...
+      $this->d('No data!');
+    }
   }
   
   /**
@@ -141,11 +180,13 @@ class DBO_MySQL {
    * @return type 
    */
   private function _select($tableName, $fields = False, $count = False){
+    $query = '';
     if ($count){
       $query = "SELECT COUNT(*) FROM $tableName";
     } else {
       $query = "SELECT * FROM $tableName";
     }
+    
     if (is_array($fields)){
       $query .= " WHERE ";
       $c = count($fields);
@@ -154,8 +195,12 @@ class DBO_MySQL {
         $query .= "`$field` = $value";
         if ($i != $c-1) {$query .= " AND ";}
       }
-    }
-    return $this->object($this->query($query));    
+    }  
+    $this->d('_select: '. $query);
+    
+    $data = $this->object($this->query($query));
+    $this->d('Data: '.json_encode($data));
+    return $data;    
   }
   
   public function get($tableName, $fields = False){
