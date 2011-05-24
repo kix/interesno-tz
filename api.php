@@ -5,22 +5,16 @@ require_once 'libs/xml_parser.php';
 ini_set('display_errors', 'On');
 ini_set('error_reporting', E_ALL);
 define('DEBUG', TRUE);
+define('APPROOT', dirname(__FILE__));
 
 class Application {
   var $config = array(
       'db_host' => '127.0.0.1',
       'db_user' => 'tz1',
       'db_pass' => '',
-      'db_base' => 'tz1'
+      'db_base' => 'tz1',
   );
-  
-  /*
-  var $db_host = '127.0.0.1';
-  var $db_user = 'tz1';
-  var $db_pass = '';
-  var $db_base = 'tz1';
-  */
-  
+   
   var $dbo;
   
   var $debug = array();
@@ -55,10 +49,24 @@ class Application {
       
       $file_id = $this->dbo->insert('files', array('name'=>$_FILES["file"]["name"], 'filename' => $filename));
       
-      $this->parser->parse(dirname(__FILE__)."/upload/".$filename);
+      $this->parser->parse($file_id);
 
      // header('Location: /'); // TODO: uploads should be AJAXy
     }  
+  }
+  /**
+   * Gets XML nodes from the database. By default returns root element only,
+   * controlled by $parent_id
+   * 
+   * TODO: Params are taken from request, this is foolish and should really be routed
+   * @param integer $file_id ID of a file to get nodes for
+   * @param integer $parent_id Parent node ID
+   */
+  function get_nodes(){
+    $file_id = $_REQUEST['file_id'];
+    $parent_id = isset($_REQUEST['parent_id']) ? $_REQUEST['parent_id'] : 0;
+    $data = $this->dbo->get('elements', array('file'=>$file_id, 'parent'=>$parent_id));
+    print json_encode($data);
   }
   
   function index(){
