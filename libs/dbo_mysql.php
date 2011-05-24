@@ -69,13 +69,15 @@ class DBO_MySQL {
     if (!$this->_link) {
       $this->connect();
     }
-    if ( substr($query,0,3) == 'INSE'
-      || substr($query,0,3) == 'UPDA') {
+    if ( substr($query,0,3) == 'INS'
+      || substr($query,0,3) == 'UPD') {
       $this->d('Insert/update query:' . $query);
       mysql_query($query, $this->_link);
-      return mysql_insert_id();
-      }
-    $this->d('Select query: ' . $query);
+      $iid = mysql_insert_id();
+      $this->d('Insert id: '.$iid);
+      return $iid;
+     }
+    else $this->d('Select query: ' . $query);
     $data = mysql_query($query, $this->_link);
 
     return $data;
@@ -172,7 +174,6 @@ class DBO_MySQL {
   }
   
   /**
-   * Deprecated
    * 
    * @param type $tableName
    * @param type $fields
@@ -193,7 +194,8 @@ class DBO_MySQL {
       $i = 0;
       foreach ($fields as $field=>$value){
         $query .= "`$field` = $value";
-        if ($i != $c-1) {$query .= " AND ";}
+        if ($i != $c - 1) {$query .= " AND ";}
+        $i++;
       }
     }  
     $this->d('_select: '. $query);
