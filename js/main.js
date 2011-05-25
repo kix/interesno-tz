@@ -12,7 +12,8 @@ function appendNodes(parent_id){
     $('#node-'+parent_id).append('<ul></ul>');
      if (data) {
        $(data).each(function(i, node){
-         $('#node-'+parent_id+' > ul').append('<li id="node-'+node.id+'"><a data-node-id="'+node.id+'" href="#node-'+node.id+'" class="node lazy closed">'+node.name+'</li>');
+         $('#node-'+parent_id+' > ul')
+         .append('<li id="node-'+node.id+'"><a data-node-id="'+node.id+'" href="#node-'+node.id+'" class="node lazy closed">'+node.name+'</a> </li>');
        })
      } else {
        $('#node-'+parent_id).html('<p class="node final">'+$('#node-'+parent_id+' a').html()+'</p>');
