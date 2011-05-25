@@ -64,7 +64,8 @@ class Application {
       
       $this->parser->parse($file_id);
 
-     // header('Location: /'); // TODO: uploads should be AJAXy
+      // whoopsie, forgot to un-comment this
+      header('Location: /'); // TODO: uploads should be AJAXy
     }  
   }
   
