@@ -7,6 +7,9 @@ ini_set('error_reporting', E_ALL);
 define('DEBUG', FALSE);
 define('APPROOT', dirname(__FILE__));
 
+/**
+ * Application class
+ */
 class Application {
   var $config = array(
       'db_host' => '127.0.0.1',
@@ -27,12 +30,19 @@ class Application {
     $this->debug[] = array('object'=>'Application', 'message'=>$msg);
   }  
   
+  /**
+   * Attaches to DB and Parser
+   */
   function __construct() {
     $this->d('Construct');
     $this->dbo = new DBO_MySQL($this);
     $this->parser = new Parser($this);
   }
   
+  /**
+   * Action to get the list of all files
+   * Gives raw JSON
+   */
   function files_list(){
     $data = $this->dbo->get('files');
     $this->d('Data: '. json_encode($data));
@@ -40,6 +50,9 @@ class Application {
     print json_encode($ret);
   }
   
+  /**
+   * File upload handler
+   */
   function upload_file(){
     if (isset($_FILES['file'])){
       $file = $_FILES["file"]["tmp_name"];
@@ -54,6 +67,7 @@ class Application {
      // header('Location: /'); // TODO: uploads should be AJAXy
     }  
   }
+  
   /**
    * Gets XML nodes from the database. By default returns root element only,
    * controlled by $parent_id
@@ -74,6 +88,7 @@ class Application {
   }
 }
 
+// Dirty app startup, could be much more clean
 $app = new Application();
 $action = $_REQUEST['action'];
 $app->d('Action: '. $action);

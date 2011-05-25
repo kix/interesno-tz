@@ -3,10 +3,15 @@
  * MySQL database access class
  * @author Stepan Anchugov <kix@kixlive.ru>
  */
+
 class DBO_MySQL {
-  
+
   protected $_link;
   
+  /**
+   * A quick and dirty in-class debugger
+   * @param type $msg Message to put in the debugger
+   */
   function d($msg){
     if ($this->app) {
       $this->app->debug[] = array('object'=>'DBO', 'message'=>$msg);
@@ -174,11 +179,11 @@ class DBO_MySQL {
   }
   
   /**
-   * 
-   * @param type $tableName
-   * @param type $fields
-   * @param type $count
-   * @return type 
+   * Private function that formats SELECT statements
+   * @param string $tableName
+   * @param array $fields
+   * @param boolean $count
+   * @return array
    */
   private function _select($tableName, $fields = False, $count = False){
     $query = '';
@@ -205,8 +210,17 @@ class DBO_MySQL {
     return $data;    
   }
   
+  /**
+   * A shortcut to SELECT
+   * @param type $tableName
+   * @param type $fields
+   * @return type 
+   */
   public function get($tableName, $fields = False){
     $ret = $this->_select($tableName, $fields, False);
+    if (count($ret) == 0) {
+      return false;
+    }
     if (count($ret) > 1) {
       return $ret;
     } else {
@@ -214,6 +228,12 @@ class DBO_MySQL {
     }
   }
   
+  /**
+   * Deletes a queried row
+   * @param string $tableName
+   * @param array $fields
+   * @return resource 
+   */
   public function drop($tableName, $fields){
     $qfields = '';
     $qwhere = '';
@@ -232,11 +252,24 @@ class DBO_MySQL {
     return $this->query($q);
   }
   
+  /**
+   * Shortcut to COUNT, gets number of rows matching given criteria
+   * @param string $tableName
+   * @param array $fields
+   * @return int Number of rows 
+   */
   public function count($tableName, $fields = False){
     $ret = $this->_select($tableName, $fields, True);
     return $ret['COUNT(*)'];
   }
   
+  /**
+   * Joined select, still TODO: work
+   * @param type $tableObj
+   * @param type $tableAdd
+   * @param type $id
+   * @return type 
+   */
   public function join($tableObj, $tableAdd, $id=-1){
 	  /*
 	  tableObj - подчиненная таблица
@@ -254,6 +287,12 @@ class DBO_MySQL {
 	  return $this->object($this->query($query));
 	}
   
+  /**
+   * Descibes a table
+   * TODO: Scary code
+   * @param string $tableName
+   * @return array
+   */
   public function describe($tableName){
     $query = "DESCRIBE $tableName";
     $fields = $this->object($this->query($query));

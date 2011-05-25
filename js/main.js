@@ -1,9 +1,6 @@
 var iddqd = "GOD MODE ON!";
 var file_id;
 
-/*
- * http://tz1.lc/api.php?action=get_nodes&file_id=38
- */
 
 /**
  * Appends a node to a certain parent
@@ -12,13 +9,13 @@ var file_id;
 function appendNodes(parent_id){
   var url = 'api.php?action=get_nodes&file_id='+file_id+'&parent_id='+parent_id;
   $.getJSON(url, function(data){
-    console.log(data);
     $('#node-'+parent_id).append('<ul></ul>');
-     if ($(data)) {
+     if (data) {
        $(data).each(function(i, node){
          $('#node-'+parent_id+' > ul').append('<li id="node-'+node.id+'"><a data-node-id="'+node.id+'" href="#node-'+node.id+'" class="node lazy closed">'+node.name+'</li>');
        })
      } else {
+       $('#node-'+parent_id).html('<p class="node final">'+$('#node-'+parent_id+' a').html()+'</p>');
        console.log('no data'); // или проверить рез-те кол-во детей
      }
    });  
