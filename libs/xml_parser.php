@@ -68,7 +68,10 @@ class Parser {
     array_push($this->route, 0);
       
     $handle = fopen(APPROOT."/upload/".$file['filename'], 'r');
-    while ($data = fread($handle, 4096)) {
+    
+    $this->d('Filesize:' . filesize(APPROOT."/upload/".$file['filename']));
+    
+    while ($data = fread($handle, filesize(APPROOT."/upload/".$file['filename']))) {
       if (!xml_parse($this->xml_parser, $data, feof($handle))) {
         $this->d('Malformed XML'); // TODO: Warn user
       }
